@@ -476,7 +476,9 @@ if (isset ($_POST['plugin']) || $installData)
 			$events = explode(",", $modulePlugin[4]);
 			$guid = modx_escape($modulePlugin[5]);
 			$category = modx_escape($modulePlugin[6]);
+			
 			$leg_names = '';
+			$disabled = modx_escape($modulePlugin[9]);
 			if(array_key_exists(7, $modulePlugin))
 			{
 				// parse comma-separated legacy names and prepare them for sql IN clause
@@ -540,7 +542,7 @@ if (isset ($_POST['plugin']) || $installData)
 				}
 				else
 				{
-					if(!@ mysql_query("INSERT INTO {$tbl_site_plugins} (name,description,plugincode,properties,moduleguid,category) VALUES('$name','$desc','$plugin','$properties','$guid',$category);"))
+					if(!@ mysql_query("INSERT INTO {$tbl_site_plugins} (name,description,plugincode,properties,moduleguid,category,disabled) VALUES('$name','$desc','$plugin','$properties','$guid',$category,$disabled);"))
 					{
 						echo "<p>" . mysql_error() . "</p>";
 						return;

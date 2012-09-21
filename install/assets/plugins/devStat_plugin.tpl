@@ -11,6 +11,7 @@
  * @internal @events OnWebPagePrerender
  * @internal @legacy_names devStat
  * @author Andchir <http://wdevblog.net.ru>
+ * @internal    @disabled 1
  */  
 
 $e = &$modx->Event;

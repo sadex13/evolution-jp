@@ -10,6 +10,7 @@
  * @internal	@events OnManagerLoginFormPrerender,OnManagerWelcomePrerender
  * @internal	@modx_category Manager and Admin
  * @internal    @installset base
+ * @internal    @disabled 1
  */
 
 /* 当プラグインの使い方
