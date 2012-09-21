@@ -2,7 +2,7 @@
 /**
  * ManagerManager
  *
- * 投稿画面を自由自在にカスタマイズ。
+ * кастомизация админки 
  *
  * @category 	plugin
  * @version 	0.3.12

@@ -22,10 +22,8 @@ elseif(32<strlen($pass1)){
 	exit;
 }
 
-$tbl_manager_users = $modx->getFullTableName('manager_users');
-$f['password'] = md5($pass1);
-$uid = $modx->getLoginUserID();
-$rs = $modx->db->update($f,$tbl_manager_users,"id='{$uid}'");
+$sql = "UPDATE $dbase.`".$table_prefix."manager_users` SET password=md5('".$pass1."') where id=".$modx->getLoginUserID().";";
+$rs = $modx->db->query($sql);
 if(!$rs){
 	echo "An error occured while attempting to save the new password.";
 	exit;

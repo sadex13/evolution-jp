@@ -330,7 +330,7 @@ input[type="search"]:focus,
 input[type="text"]:focus,
 input[type="url"]:focus,
 textarea:focus,
-form select:focus
+select:focus
 {
 	outline: none;
 	background: #fff;
@@ -338,8 +338,7 @@ form select:focus
 	border-style: solid;
 	border-width: 1px;
 }
-input[type="button"],
-input[type="submit"] {
+input[type="button"] {
 background:#ededed;
 	border: 1px solid green;
 	cursor: pointer;
@@ -358,14 +357,14 @@ background:#ededed;
 			-webkit-border-radius:3px;
 			border-radius:3px;
 	}
-	input[type="button"]:hover,
-	input[type="submit"] {
+	input[type="button"]:hover {
 		border-color: green;
 		background:-moz-linear-gradient(#FFFFFF, #EEEEEE);
 		background:-webkit-gradient(linear, 0 0, 0 100%, from(#FFFFFF), to(#EEEEEE));
 		background:-o-linear-gradient(#FFFFFF, #EEEEEE);
 		filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#FFFFFF,endColorstr=#EEEEEE); zoom:1;
 	}
+
 input.checkbox,
 input.radio,
 input.submit,
@@ -379,7 +378,7 @@ input[type="button"] {
 	cursor:pointer;cursor:hand;
 }
 select {
-	border: 1px solid #c3c3c3;
+	border: 1px solid #c3c3c3 !important;
 	border: 0;
 	background: #fcfcfc;
 	cursor:pointer;cursor:hand;

@@ -143,7 +143,7 @@ if ($moduleSQLBaseFile) {
 
 // write the config.inc.php file if new installation
 echo "<p>" . $_lang['writing_config_file'];
-$src = file_get_contents("{$base_path}install/tpl/config.inc.tpl");
+$src = file_get_contents('config.inc.tpl');
 $ph['database_type']               = 'mysql';
 $ph['database_server']             = $database_server;
 $ph['database_user']               = modx_escape($database_user);
@@ -153,6 +153,7 @@ $ph['database_connection_method']  = $database_connection_method;
 $ph['dbase']                       = $dbase;
 $ph['table_prefix']                = $table_prefix;
 $ph['lastInstallTime']             = time();
+$ph['site_sessionname']            = (!isset ($site_sessionname)) ? 'SN' . uniqid('') : $site_sessionname;
 $ph['https_port']                  = '443';
 
 $src = parse($src, $ph);
@@ -668,12 +669,7 @@ if (file_exists("{$base_path}assets/cache/installProc.inc.php"))
 	@chmod("{$base_path}assets/cache/installProc.inc.php", 0755);
 	unlink("{$base_path}assets/cache/installProc.inc.php");
 }
-if(is_writeable($base_path) && $installMode==0)
-{
-	copy("{$base_path}install/tpl/robots.tpl",    "{$base_path}sample.robots.txt");
-	if(!is_iis()) copy("{$base_path}install/tpl/htaccess.tpl",  "{$base_path}sample.htaccess");
-	else          copy("{$base_path}install/tpl/web.config.tpl","{$base_path}web.config");
-}
+
 // setup completed!
 echo "<p><b>" . $_lang['installation_successful'] . "</b></p>";
 echo "<p>" . $_lang['to_log_into_content_manager'] . "</p>";

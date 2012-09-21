@@ -29,7 +29,7 @@ if($_SESSION['mgrRole']!=1){
 	//attached so permission granted
 	$permissionAccessInt = -1;
 
-	while ($row = $modx->db->getRow($rs)) {
+	while ($row = $modx->fetchRow($rs)) {
 		if($row["usergroup"] && $row["member"]) {
 			//if there are permissions and this member has permission, ofcourse
 			//this is granted
@@ -56,7 +56,7 @@ $sql = "SELECT * " .
 		"FROM ".$modx->getFullTableName("site_modules")." " .
 		"WHERE id = $id;";
 $rs = $modx->db->query($sql);
-$limit = $modx->db->getRecordCount($rs);
+$limit = mysql_num_rows($rs);
 if($limit>1) {
 	echo "<script type='text/javascript'>" .
 			"function jsalert(){ alert('Multiple modules sharing same unique id $id. Please contact the Site Administrator');" .

@@ -774,7 +774,7 @@ INSERT IGNORE INTO `{PREFIX}system_settings`
 ('server_offset_time','0'),
 ('manager_language','{MANAGERLANGUAGE}'),
 ('modx_charset','UTF-8'),
-('site_name','My MODX Site'),
+('site_name','My MODX Site By Dmi3yy'),
 ('site_start','1'),
 ('error_page','1'),
 ('unauthorized_page','1'),

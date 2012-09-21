@@ -321,11 +321,10 @@ EOT;
 	} // end renderFormElement function
 
 	function ParseIntputOptions($v) {
-		global $modx;
 		$a = array();
 		if(is_array($v)) return $v;
 		else if(is_resource($v)) {
-			while ($cols = $modx->db->getRow($v,'num')) $a[] = $cols;
+			while ($cols = mysql_fetch_row($v)) $a[] = $cols;
 		}
 		else $a = explode("||", $v);
 		return $a;

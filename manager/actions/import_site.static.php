@@ -223,7 +223,7 @@ function importFiles($parent,$filedir,$files,$mode) {
 					else
 					{
 						echo '<span class="fail">'.$_lang["import_site_failed"]."</span> "
-						.$_lang["import_site_failed_db_error"].$modx->db->getLastError();
+						.$_lang["import_site_failed_db_error"].mysql_error();
 						exit;
 					}
 					break;
@@ -275,7 +275,7 @@ function importFiles($parent,$filedir,$files,$mode) {
 				else
 				{
 					echo '<span class="fail">'.$_lang["import_site_failed"]."</span> "
-					.$_lang["import_site_failed_db_error"].$modx->db->getLastError();
+					.$_lang["import_site_failed_db_error"].mysql_error();
 					exit;
 				}
 				

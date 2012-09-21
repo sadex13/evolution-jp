@@ -137,11 +137,8 @@ function confirmDelete() {
 	return confirm("<?php echo $_lang['confirm_delete_file'] ?>");
 }
 
-function confirmDeleteFolder(status) {
-	if(status!='file_exists')
-		return confirm("<?php echo $_lang['confirm_delete_dir']; ?>");
-	else
-		return confirm("<?php echo $_lang['confirm_delete_dir_recursive']; ?>");
+function confirmDeleteFolder() {
+	return confirm("<?php echo str_replace('file','folder',$_lang['confirm_delete_file']) ?>");
 }
 
 function confirmUnzip() {
@@ -162,8 +159,8 @@ function getFileName(a){
 	return (f) ? true:false;
 }
 
-function deleteFolder (folder,status) {
-    if (confirmDeleteFolder(status))
+function deleteFolder (folder) {
+    if (confirmDeleteFolder())
     {
         window.location.href="index.php?a=31&mode=deletefolder&path="+current_path+"&folderpath="+current_path+'/'+folder+"&token=<?php echo $token;?>";
         return false;
@@ -197,115 +194,96 @@ if (is_writable($startpath))
 }
 
 
-if(!empty($_FILES['userfile']))
-{
-	for ($i = 0; $i <= count($_FILES['userfile']['tmp_name']); $i++)
-	{
-		if(!empty($_FILES['userfile']['tmp_name'][$i]))
-		{
-			$userfiles[$i]['tmp_name'] = $_FILES['userfile']['tmp_name'][$i];
-			$userfiles[$i]['error']    = $_FILES['userfile']['error'][$i];
-			$name = $_FILES['userfile']['name'][$i];
-			if($modx->config['clean_uploaded_filename'])
-			{
-				$nameparts = explode('.', $name);
-				$nameparts = array_map(array($modx, 'stripAlias'), $nameparts);
-				$name = implode('.', $nameparts);
-			}
-			$userfiles[$i]['name'] = $name;
-			$userfiles[$i]['type'] = $_FILES['userfile']['type'][$i];
-		}
-	}
+if(!empty($_FILES['userfile'])) {
 
-	foreach((array)$userfiles as $userfile)
-	{
-		// this seems to be an upload action.
-		printf("<p>".$_lang['files_uploading']."</p>", $userfile['name'], substr($startpath, strlen($filemanager_path), strlen($startpath)));
-		if($userfile['error']==0)
-		{
-			echo "<p>".$_lang['files_file_type'].$userfile['type'].", ".$modx->nicesize($userfile['tmp_name']).'</p>';
-		}
-		
-		$userfilename = $userfile['tmp_name'];
-		
-		if (is_uploaded_file($userfilename))
-		{
-			// file is uploaded file, process it!
-			if(!in_array(getExtension($userfile['name']), $uploadablefiles))
-			{
-				echo '<p><span class="warning">'.$_lang['files_filetype_notok'].'</span></p>';
-			}
-			else
-			{
-				if(@move_uploaded_file($userfile['tmp_name'], $_POST['path'].'/'.$userfile['name']))
-				{
+  for ($i = 0; $i <= count($_FILES['userfile']['tmp_name']); $i++) {
+   if(!empty($_FILES['userfile']['tmp_name'][$i])) {
+     $userfiles[$i]['tmp_name'] = $_FILES['userfile']['tmp_name'][$i];
+     $userfiles[$i]['error'] = $_FILES['userfile']['error'][$i];
+            $name = $_FILES['userfile']['name'][$i];
+            if($modx->config['clean_uploaded_filename']) {
+                $nameparts = explode('.', $name);
+                $nameparts = array_map(array($modx, 'stripAlias'), $nameparts);
+                $name = implode('.', $nameparts);
+            }
+            $userfiles[$i]['name'] = $name;
+     $userfiles[$i]['type'] = $_FILES['userfile']['type'][$i];
+   }
+  }
+
+  foreach((array)$userfiles as $userfile) {
+
+	// this seems to be an upload action.
+	printf("<p>".$_lang['files_uploading']."</p>", $userfile['name'], substr($startpath, strlen($filemanager_path), strlen($startpath)));
+	echo $userfile['error']==0 ? "<p>".$_lang['files_file_type'].$userfile['type'].", ".$modx->nicesize($userfile['tmp_name']).'</p>' : '';
+
+	$userfilename = $userfile['tmp_name'];
+
+	if (is_uploaded_file($userfilename)) {
+	  // file is uploaded file, process it!
+		if(!in_array(getExtension($userfile['name']), $uploadablefiles)) {
+			echo '<p><span class="warning">'.$_lang['files_filetype_notok'].'</span></p>';
+		} else {
+			if(@move_uploaded_file($userfile['tmp_name'], $_POST['path'].'/'.$userfile['name'])) {
 					// Ryan: Repair broken permissions issue with file manager
 					if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN')
 						@chmod($_POST['path']."/".$userfile['name'], $new_file_permissions);
 					// Ryan: End
 					echo '<p><span class="success">'.$_lang['files_upload_ok'].'</span></p>';
-					
+
 					// invoke OnFileManagerUpload event
 					$modx->invokeEvent('OnFileManagerUpload',
-					array(
-					'filepath'	=> $_POST['path'],
-					'filename'	=> $userfile['name']
+						array(
+							'filepath'	=> $_POST['path'],
+							'filename'	=> $userfile['name']
 					));
 					// Log the change
 					logFileChange('upload', $_POST['path'].'/'.$userfile['name']);
-				}
-				else
-				{
-					echo '<p><span class="warning">'.$_lang['files_upload_copyfailed'].'</span> '.$_lang["files_upload_permissions_error"].'</p>';
-				}
+			} else {
+				echo '<p><span class="warning">'.$_lang['files_upload_copyfailed'].'</span> '.$_lang["files_upload_permissions_error"].'</p>';
 			}
 		}
-		else
-		{
-			echo '<br /><span class="warning"><b>'.$_lang['files_upload_error'].':</b>';
-			switch($userfile['error'])
-			{
-				case 0: //no error; possible file attack!
-					echo $_lang['files_upload_error0'];
-					break;
-				case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
-					echo $_lang['files_upload_error1'];
-					break;
-				case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
-					echo $_lang['files_upload_error2'];
-					break;
-				case 3: //uploaded file was only partially uploaded
-					echo $_lang['files_upload_error3'];
-					break;
-				case 4: //no file was uploaded
-					echo $_lang['files_upload_error4'];
-					break;
-				default: //a default error, just in case!  :)
-					echo $_lang['files_upload_error5'];
-					break;
-			}
-			echo '</span><br />';
+        } else {
+		echo '<br /><span class="warning"><b>'.$_lang['files_upload_error'].':</b>';
+	  switch($userfile['error']){
+	   case 0: //no error; possible file attack!
+		 echo $_lang['files_upload_error0'];
+		 break;
+	   case 1: //uploaded file exceeds the upload_max_filesize directive in php.ini
+		 echo $_lang['files_upload_error1'];
+		 break;
+	   case 2: //uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the html form
+		 echo $_lang['files_upload_error2'];
+		 break;
+	   case 3: //uploaded file was only partially uploaded
+		 echo $_lang['files_upload_error3'];
+		 break;
+	   case 4: //no file was uploaded
+		 echo $_lang['files_upload_error4'];
+		 break;
+	   default: //a default error, just in case!  :)
+		 echo $_lang['files_upload_error5'];
+		 break;
 		}
-		echo '<hr/>';
+		echo '</span><br />';
 	}
+	echo '<hr/>';
+    }
 }
 
-if($_POST['mode']=='save')
-{
+if($_POST['mode']=='save') {
 	echo $_lang['editing_file'];
 	$filename = $_POST['path'];
-	$content  = $_POST['content'];
+	$content = $_POST['content'];
 
 	// Write $content to our opened file.
-	if (file_put_contents($filename, $content) === FALSE)
-	{
-		echo '<span class="warning"><b>'.$_lang['file_not_saved'].'</b></span><br /><br />';
+	if (file_put_contents($filename, $content) === FALSE) {
+	   echo '<span class="warning"><b>'.$_lang['file_not_saved'].'</b></span><br /><br />';
+	} else {
+	   echo '<span class="success"><b>'.$_lang['file_saved'].'</b></span><br /><br />';
+	   $_REQUEST['mode'] = 'edit';
 	}
-	else
-	{
-		echo '<span class="success"><b>'.$_lang['file_saved'].'</b></span><br /><br />';
-		$_REQUEST['mode'] = 'edit';
-	}
+
 	// Log the change
 	logFileChange('modify', $filename);
 }
@@ -317,15 +295,15 @@ if($_REQUEST['mode']=='delete')
 	$file = $_REQUEST['path'];
 	if(!$token_check)
 	{
-		echo '<span class="warning"><b>'.$_lang['file_not_deleted'].'</b></span><br /><br />';
+	   echo '<span class="warning"><b>'.$_lang['file_not_deleted'].'</b></span><br /><br />';
 	}
 	elseif(!@unlink($file))
 	{
-		echo '<span class="warning"><b>'.$_lang['file_not_deleted'].'</b></span><br /><br />';
+	   echo '<span class="warning"><b>'.$_lang['file_not_deleted'].'</b></span><br /><br />';
 	}
 	else
 	{
-		echo '<span class="success"><b>'.$_lang['file_deleted'].'</b></span><br /><br />';
+	   echo '<span class="success"><b>'.$_lang['file_deleted'].'</b></span><br /><br />';
 	}
 
 	// Log the change
@@ -415,7 +393,7 @@ if (is_writable($startpath))
 		{
 		   echo '<span class="warning"><b>'.$_lang['file_folder_not_deleted'].'</b></span><br /><br />';
 		}
-		elseif(!@rrmdir($folder))
+		elseif(!@rmdir($folder))
 		{
 			echo '<span class="warning"><b>'.$_lang['file_folder_not_deleted'].'</b></span><br /><br />';
 		}
@@ -430,7 +408,7 @@ if (is_writable($startpath))
 	{
 		$old_umask = umask(0);
 		$foldername = str_replace('..\\','',str_replace('../','',$_REQUEST['name']));
-		if(!mkdirs("{$startpath}/{$foldername}",0777))
+		if(!mkdirs("{$startpath}/{$foldername}",$newfolderaccessmode))
 		{
 			echo '<span class="warning"><b>',$_lang['file_folder_not_created'],'</b></span><br /><br />';
 		}
@@ -607,7 +585,6 @@ function ls($curpath)
 	while ($file = $dir->read())
 	{
 		$newpath = $curpath.$file;
-		if($file==='..'||$file==='.') continue;
 		if(is_dir($newpath))
 		{
 			$dirs_array[$dircounter]['dir'] = $newpath;
@@ -616,21 +593,7 @@ function ls($curpath)
 			elseif(!in_array($file, $excludes) && !in_array($newpath,$proteted_path))
 			{
 				$dirs_array[$dircounter]['text'] = '<img src="' . $style_path.'tree/folder.gif" align="absmiddle" alt="" /> <a href="index.php?a=31&mode=drill&path='.urlencode($newpath).'"><b>'.$file.'</b></a>';
-				
-				$dfiles = scandir($newpath);
-				foreach($dfiles as $i=>$infile)
-				{
-					switch($infile)
-					{
-						case '..':
-						case '.':
-							unset($dfiles[$i]);
-							break;
-					}
-				}
-				$file_exists = (0<count($dfiles)) ? 'file_exists' : '';
-				
-				$dirs_array[$dircounter]['delete'] = is_writable($curpath) ? '<span style="width:20px"><a href="javascript: deleteFolder(\''.urlencode($file).'\',\'' . $file_exists . '\');"><img src="'.$style_path.'icons/delete.gif" alt="'.$_lang['file_delete_folder'].'" title="'.$_lang['file_delete_folder'].'" /></a></span>' : '';
+				$dirs_array[$dircounter]['delete'] = is_writable($curpath) ? '<span style="width:20px"><a href="javascript: deleteFolder(\''.urlencode($file).'\');"><img src="'.$style_path.'icons/delete.gif" alt="'.$_lang['file_delete_folder'].'" title="'.$_lang['file_delete_folder'].'" /></a></span>' : '';
 			}
 			else
 			{
@@ -779,7 +742,7 @@ function unzip($file, $path)
 						$tmp .= $k.'\\';
 						if(!file_exists($tmp))
 						{
-							@mkdir($tmp, 0777);
+							@mkdir($tmp, $newfolderaccessmode);
 						}
 					}
 				}
@@ -797,14 +760,4 @@ function unzip($file, $path)
 		return true;
 	}
 	zip_close($zip);
-}
-
-function rrmdir($dir)
-{
-	foreach(glob($dir . '/*') as $file)
-	{
-		if(is_dir($file)) rrmdir($file);
-		else              unlink($file);
-	}
-	return rmdir($dir);
 }

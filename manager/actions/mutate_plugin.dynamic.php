@@ -25,7 +25,7 @@ $id = isset($_REQUEST['id']) ? intval($_REQUEST['id']) : 0;
 // check to see the plugin editor isn't locked
 $tbl_active_users = $modx->getFullTableName('active_users');
 $rs = $modx->db->select('internalKey, username',$tbl_active_users,"action='102' AND id='{$id}'");
-$limit = $modx->db->getRecordCount($rs);
+$limit = mysql_num_rows($rs);
 if($limit>1)
 {
 	while($lock = $modx->db->getRow)
@@ -545,7 +545,7 @@ if(is_array($evtOut)) echo implode("",$evtOut);
 		$evts = array();
 		$tbl_site_plugin_events = $modx->getFullTableName('site_plugin_events');
 		$rs = $modx->db->select('evtid, pluginid',$tbl_site_plugin_events,"pluginid='{$id}'");
-		while($row = $modx->db->getRow($rs))
+		while($row = mysql_fetch_assoc($rs))
 		{
 		   $evts[] = $row['evtid'];
 		}

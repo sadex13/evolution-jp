@@ -1,0 +1,1 @@
+a:1:{i:1;a:4:{s:2:"id";s:1:"1";s:5:"alias";s:12:"minimal-base";s:4:"path";s:0:"";s:6:"parent";s:1:"0";}}

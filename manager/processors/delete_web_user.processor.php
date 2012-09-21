@@ -6,12 +6,9 @@ if(!$modx->hasPermission('delete_web_user')) {
 }
 $id=intval($_GET['id']);
 
-$tbl_web_users           = $modx->getFullTableName('web_users');
-$tbl_web_groups          = $modx->getFullTableName('web_groups');
-$tbl_web_user_attributes = $modx->getFullTableName('web_user_attributes');
-
 // get user name
-$rs = $modx->db->select('*',$tbl_web_users,"id='{$id}'",'','1');
+$sql = "SELECT * FROM $dbase.`".$table_prefix."web_users` WHERE $dbase.`".$table_prefix."web_users`.id='".$id."' LIMIT 1;";
+$rs = $modx->db->query($sql);
 if($rs) {
 	$row = $modx->db->getRow($rs);
 	$username = $row['username'];
@@ -25,19 +22,22 @@ $modx->invokeEvent("OnBeforeWUsrFormDelete",
 					));
 
 // delete the user.
-$rs = $modx->db->delete($tbl_web_users,"id='{$id}'");
+$sql = "DELETE FROM $dbase.`".$table_prefix."web_users` WHERE $dbase.`".$table_prefix."web_users`.id=".$id.";";
+$rs = $modx->db->query($sql);
 if(!$rs) {
 	echo "Something went wrong while trying to delete the web user...";
 	exit;
 }
 // delete user groups
-$rs = $modx->db->delete($tbl_web_groups,"webuser='{$id}'");
+$sql = "DELETE FROM $dbase.`".$table_prefix."web_groups` WHERE $dbase.`".$table_prefix."web_groups`.webuser=".$id.";";
+$rs = $modx->db->query($sql);
 if(!$rs) {
 	echo "Something went wrong while trying to delete the web user's access permissions...";
 	exit;
 }
 // delete the attributes
-$rs = $modx->db->delete($tbl_web_user_attributes,"internalKey='{$id}'");
+$sql = "DELETE FROM $dbase.`".$table_prefix."web_user_attributes` WHERE $dbase.`".$table_prefix."web_user_attributes`.internalKey=".$id.";";
+$rs = $modx->db->query($sql);
 if(!$rs) {
 	echo "Something went wrong while trying to delete the web user attributes...";
 	exit;

@@ -1,6 +1,6 @@
 <?php
-setlocale (LC_TIME, 'ja_JP.UTF-8');
-if(function_exists('date_default_timezone_set')) date_default_timezone_set('Asia/Tokyo');
+setlocale (LC_TIME, 'ru_RU.UTF-8');
+if(function_exists('date_default_timezone_set')) date_default_timezone_set('Europe/Kiev');
 
 // check PHP version. MODX Evolution is compatible with php 4 (4.4.2+)
 if(version_compare(phpversion(), '4.4.2') < 0)

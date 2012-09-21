@@ -1,8 +1,8 @@
 //<?php
 /**
- * Bindings機能の有効無効
+ * Bindings
  * 
- * グローバル設定にBindings機能の有効無効の設定項目を追加します
+ * Включение Bindings
  *
  * @category 	plugin
  * @version 	0.1.2

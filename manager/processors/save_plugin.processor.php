@@ -18,22 +18,22 @@ $sysevents = $_POST['sysevents'];
 
 //Kyle Jaebker - added category support
 if (empty($_POST['newcategory']) && $_POST['categoryid'] > 0) {
-    $category = $modx->db->escape($_POST['categoryid']);
+    $categoryid = $modx->db->escape($_POST['categoryid']);
 } elseif (empty($_POST['newcategory']) && $_POST['categoryid'] <= 0) {
-    $category = '0';
+    $categoryid = '0';
 } else {
     include_once "categories.inc.php";
     $catCheck = checkCategory($modx->db->escape($_POST['newcategory']));
     if ($catCheck) {
-        $category = $catCheck;
+        $categoryid = $catCheck;
     } else {
-        $category = newCategory($_POST['newcategory']);
+        $categoryid = newCategory($_POST['newcategory']);
     }
 }
 
 if($name=="") $name = "Untitled plugin";
 
-$tbl_site_plugins = $modx->getFullTableName('site_plugins');
+$tblSitePlugins = $modx->getFullTableName('site_plugins');
 switch ($_POST['mode']) {
     case '101':
 
@@ -45,7 +45,8 @@ switch ($_POST['mode']) {
                                 ));
     
 		// disallow duplicate names for new plugins
-		$rs = $modx->db->select('COUNT(id)',$tbl_site_plugins,"name='{$name}'");
+		$sql = "SELECT COUNT(id) FROM {$dbase}.`{$table_prefix}site_plugins` WHERE name = '{$name}'";
+		$rs = $modx->db->query($sql);
 		$count = $modx->db->getValue($rs);
 		if($count > 0) {
 			$modx->event->alert(sprintf($_lang['duplicate_name_found_general'], $_lang['plugin'], $name));
@@ -72,7 +73,7 @@ switch ($_POST['mode']) {
 		}
 
 		//do stuff to save the new plugin
-        $sql = "INSERT INTO {$tbl_site_plugins} (name, description, plugincode, disabled, moduleguid, locked, properties, category) VALUES('{$name}', '{$description}', '{$plugincode}', {$disabled}, '{$moduleguid}', {$locked}, '{$properties}', {$category});";
+        $sql = "INSERT INTO {$tblSitePlugins} (name, description, plugincode, disabled, moduleguid, locked, properties, category) VALUES('{$name}', '{$description}', '{$plugincode}', {$disabled}, '{$moduleguid}', {$locked}, '{$properties}', {$categoryid});";
         $rs = $modx->db->query($sql);
         if(!$rs){
             echo "\$rs not set! New plugin not saved!";
@@ -115,7 +116,7 @@ switch ($_POST['mode']) {
                                 ));
      
         //do stuff to save the edited plugin
-        $sql = "UPDATE {$tbl_site_plugins} SET name='{$name}', description='{$description}', plugincode='{$plugincode}', disabled={$disabled}, moduleguid='{$moduleguid}', locked={$locked}, properties='{$properties}', category={$category}  WHERE id={$id}";
+        $sql = "UPDATE {$tblSitePlugins} SET name='{$name}', description='{$description}', plugincode='{$plugincode}', disabled={$disabled}, moduleguid='{$moduleguid}', locked={$locked}, properties='{$properties}', category={$categoryid}  WHERE id={$id}";
         $rs = $modx->db->query($sql);
         if(!$rs){
             echo "\$rs not set! Edited plugin not saved!";

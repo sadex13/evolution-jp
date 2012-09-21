@@ -305,14 +305,12 @@ function decodeParamValue($s)
 // returns an array if a delimiter is present. returns array is a recordset is present
 function parseInput($src, $delim='||', $type='string', $columns=true)
 { // type can be: string, array
-	global $modx;
-	
 	if (is_resource($src))
 	{
 		// must be a recordset
 		$rows = array();
 		$nc = mysql_num_fields($src);
-		while ($cols = $modx->db->getRow($src,'num'))
+		while ($cols = mysql_fetch_row($src))
 		{
 			$rows[] = ($columns)? $cols : implode(' ',$cols);
 		}

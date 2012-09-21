@@ -4,7 +4,7 @@ if(!$modx->hasPermission('settings')) {
 	$e->setError(3);
 	$e->dumpError();
 }
-if($_POST['friendly_urls']==='1' && strpos($_SERVER['SERVER_SOFTWARE'],'IIS')===false)
+if($_POST['friendly_urls']==='1')
 {
 	$htaccess        = $modx->config['base_path'] . '.htaccess';
 	$sample_htaccess = $modx->config['base_path'] . 'sample.htaccess';

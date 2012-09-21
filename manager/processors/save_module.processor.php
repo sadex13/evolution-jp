@@ -4,9 +4,6 @@ if(!$modx->hasPermission('save_module')) {
 	$e->setError(3);
 	$e->dumpError();
 }
-
-$tbl_site_modules = $modx->getFullTableName('site_modules');
-
 $id = intval($_POST['id']);
 $name = $modx->db->escape(trim($_POST['name']));
 $description = $modx->db->escape($_POST['description']);
@@ -15,6 +12,7 @@ $enable_resource = $_POST['enable_resource']=='on' ? 1 : 0 ;
 if(($_POST['icon']!=='') && (preg_match('@^(' . $modx->config['rb_base_url'] . ')@', $_POST['icon'])==1))
     $_POST['icon'] = '../' . $_POST['icon'];
 $icon = $modx->db->escape($_POST['icon']);
+//$category = intval($_POST['category']);
 $disabled = $_POST['disabled']=='on' ? 1 : 0 ;
 $wrap = $_POST['wrap']=='on' ? 1 : 0 ;
 $locked = $_POST['locked']=='on' ? 1 : 0 ;
@@ -26,16 +24,16 @@ $createdon = $editedon = time();
 
 //Kyle Jaebker - added category support
 if (empty($_POST['newcategory']) && $_POST['categoryid'] > 0) {
-    $category = $modx->db->escape($_POST['categoryid']);
+    $categoryid = $modx->db->escape($_POST['categoryid']);
 } elseif (empty($_POST['newcategory']) && $_POST['categoryid'] <= 0) {
-    $category = 0;
+    $categoryid = 0;
 } else {
     include_once "categories.inc.php";
     $catCheck = checkCategory($modx->db->escape($_POST['newcategory']));
     if ($catCheck) {
-        $category = $catCheck;
+        $categoryid = $catCheck;
     } else {
-        $category = newCategory($_POST['newcategory']);
+        $categoryid = newCategory($_POST['newcategory']);
     }
 }
 
@@ -51,7 +49,8 @@ switch ($_POST['mode']) {
 							));
 							
 		// disallow duplicate names for new modules
-		$rs = $modx->db->query('COUNT(id)',$tbl_site_modules,"name = '{$name}'");
+		$sql = "SELECT COUNT(id) FROM {$dbase}.`{$table_prefix}site_modules` WHERE name = '{$name}'";
+		$rs = $modx->db->query($sql);
 		$count = $modx->db->getValue($rs);
 		if($count > 0) {
 			$modx->event->alert(sprintf($_lang['duplicate_name_found_module'], $name));
@@ -72,7 +71,7 @@ switch ($_POST['mode']) {
 			$content['enable_resource'] = $enable_resource;
 			$content['enable_sharedparams'] = $enable_sharedparams;
 			$content['usrgroups'] = $_POST['usrgroups'];
-			
+
 
 			include 'header.inc.php';
 			include(dirname(dirname(__FILE__)).'/actions/mutate_module.dynamic.php');
@@ -82,18 +81,19 @@ switch ($_POST['mode']) {
 		}
 
 		// save the new module
-		
-		$f = array();
-		$f = compact('name','description','icon','enable_resource','resourcefile',
-		             'disabled','wrap','locked','category','enable_sharedparams',
-		             'guid','modulecode','properties','editedon','createdon');
-		$rs = $modx->db->insert($f,$tbl_site_modules);
+		$sql = "INSERT INTO ".$modx->getFullTableName("site_modules")." (name, description, disabled, wrap, locked, icon, resourcefile, enable_resource, category, enable_sharedparams, guid, modulecode, properties, createdon, editedon) VALUES('".$name."', '".$description."', '".$disabled."', '".$wrap."', '".$locked."', '".$icon."', '".$resourcefile."', '".$enable_resource."', '".$categoryid."', '".$enable_sharedparams."', '".$guid."', '".$modulecode."', '".$properties."', '" . $createdon."', '".$editedon."');";
+		$rs = $modx->db->query($sql);
 		if(!$rs){
 			echo "\$rs not set! New module not saved!";
 			exit;
 		}
-		else
-		{
+		else {
+			// get the id
+			if(!$newid=mysql_insert_id()) {
+				echo "Couldn't get last insert key!";
+				exit;
+			}
+			
 			// save user group access permissions
 			saveUserGroupAccessPermissons();
 			
@@ -103,14 +103,10 @@ switch ($_POST['mode']) {
 									"mode"	=> "new",
 									"id"	=> $newid
 								));
-			if($_POST['stay']!='')
-			{
-				$stay = $_POST['stay'];
-				$a = ($stay=='2') ? "108&id={$newid}":'107';
-				$header="Location: index.php?a={$a}&r=2&stay={$stay}";
-			}
-			else
-			{
+			if($_POST['stay']!='') {
+				$a = ($_POST['stay']=='2') ? "108&id={$newid}":"107";
+				$header="Location: index.php?a=".$a."&r=2&stay=".$_POST['stay'];
+			} else {
 				$header="Location: index.php?a=106&r=2";
 			}
 			if($enable_sharedparams!==0) $modx->clearCache();
@@ -126,13 +122,10 @@ switch ($_POST['mode']) {
 							));	
 								
 		// save the edited module
-		$f = array();
-		$f = compact('name','description','icon','enable_resource','resourcefile',
-		             'disabled','wrap','locked','category','enable_sharedparams',
-		             'guid','modulecode','properties','editedon');
-		$rs = $modx->db->update($f,$tbl_site_modules,"id='{$id}'");
+		$sql = "UPDATE ".$modx->getFullTableName("site_modules")." SET name='".$name."', description='".$description."', icon='".$icon."', enable_resource='".$enable_resource."', resourcefile='".$resourcefile."', disabled='".$disabled."', wrap='".$wrap."', locked='".$locked."', category='".$categoryid."', enable_sharedparams='".$enable_sharedparams."', guid='".$guid."', modulecode='".$modulecode."', properties='".$properties."', editedon='".$editedon."'  WHERE id='".$id."';";
+		$rs = $modx->db->query($sql);
 		if(!$rs){
-			echo "\$rs not set! Edited module not saved!".$modx->db->getLastError();
+			echo "\$rs not set! Edited module not saved!".mysql_error();
 			exit;
 		}
 		else {
@@ -166,32 +159,24 @@ function saveUserGroupAccessPermissons(){
 	global $modx;
 	global $id,$newid;
 	global $use_udperms;
-	
-	$tbl_site_module_access = $modx->getFullTableName('site_module_access');
-	
+
 	if($newid) $id = $newid;
 	$usrgroups = $_POST['usrgroups'];
 
 	// check for permission update access
-	if($use_udperms==1)
-	{
+	if($use_udperms==1) {
 		// delete old permissions on the module
-		
-		$rs = $modx->db->delete($tbl_site_module_access, "module='{$id}'");
-		if(!$rs)
-		{
+		$sql = "DELETE FROM ".$modx->getFullTableName("site_module_access")." WHERE module=$id;";
+		$rs = $modx->db->query($sql);
+		if(!$rs){
 			echo "An error occured while attempting to delete previous module user access permission entries.";
 			exit;
 		}
-		elseif(is_array($usrgroups))
-		{
-			foreach ($usrgroups as $ugkey=>$value)
-			{
-				$f['module']    = $id;
-				$f['usergroup'] = $modx->db->escape($value);
-				$rs = $modx->db->insert($f,$tbl_site_module_access);
-				if(!$rs)
-				{
+		if(is_array($usrgroups)) {
+			foreach ($usrgroups as $ugkey=>$value) {
+				$sql = "INSERT INTO ".$modx->getFullTableName("site_module_access")." (module,usergroup) values($id,".stripslashes($value).")";
+				$rs = $modx->db->query($sql);
+				if(!$rs){
 					echo "An error occured while attempting to save module user acess permissions.";
 					exit;
 				}

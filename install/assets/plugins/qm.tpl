@@ -2,7 +2,7 @@
 /**
  * Quick Manager+
  * 
- * 管理画面へのアクセス不要。今開いているページから編集ウィンドウを開きます
+ * Быстрый редактор контента на фронтэнде
  *
  * @category 	plugin
  * @version 	1.5.5r5
@@ -22,5 +22,5 @@ if (isset($_SESSION['mgrValidated']))
 	include_once($modx->config['base_path'].'assets/plugins/qm/qm.inc.php');
 	$modx->event->params['version'] = $version;
 	$qm = new Qm($modx, $modx->event->params);
-	$qm->jqpath = 'manager/media/script/jquery/jquery.min.js';
+	$qm->jqpath = 'assets/js/jquery.min.js';
 }

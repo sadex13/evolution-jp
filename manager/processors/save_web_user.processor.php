@@ -116,7 +116,7 @@ switch ($_POST['mode']) {
 			exit;
 		}
 		// now get the id
-		if (!$key = $modx->db->->getInsertId()) {
+		if (!$key = mysql_insert_id()) {
 			//get the key by sql
 		}
 
@@ -235,7 +235,7 @@ switch ($_POST['mode']) {
 			webAlert("An error occurred while attempting to retrieve all users with username $newusername.");
 			exit;
 		}
-		$limit = $modx->db->getRecordCount($rs);
+		$limit = mysql_num_rows($rs);
 		if ($limit > 0) {
 			$row = $modx->db->getRow($rs);
 			if ($row['id'] != $id) {
@@ -249,7 +249,7 @@ switch ($_POST['mode']) {
 			webAlert("An error occurred while attempting to retrieve all users with email $email.");
 			exit;
 		}
-		$limit = $modx->db->getRecordCount($rs);
+		$limit = mysql_num_rows($rs);
 		if ($limit > 0) {
 			$row = $modx->db->getRow($rs);
 			if ($row['internalKey'] != $id) {
@@ -450,6 +450,7 @@ function ConvertDate($date) {
 // Web alert -  sends an alert to web browser
 function webAlert($msg) {
 	global $id, $modx;
+	global $dbase, $table_prefix;
 	$mode = $_POST['mode'];
 	$url = "index.php?a=$mode" . ($mode == '88' ? "&id={$id}" : '');
 	$modx->manager->saveFormValues($mode);

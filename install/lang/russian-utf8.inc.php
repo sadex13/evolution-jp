@@ -8,7 +8,7 @@
  * 
  * Filename:       /install/lang/russian-utf8.inc.php
  * Language:       Russian
- * Encoding:       UTF-8
+ * Encoding:       utf-8
  * Translated by:  Pertsev Dmitriy, Safronovich Victor, Russian MODx Community
  * Date:           15 october 2009
  */
@@ -198,11 +198,8 @@ $_lang["you_running_php"] = ' - вы используете PHP ';
 $_lang['checking_if_backup_exists'] = 'Checking if <span class="mono">/assets/backup</span> directory exists: ';
 $_lang['checking_if_backup_writable'] = 'Checking if <span class="mono">/assets/backup</span> directory is writable: ';
 $_lang['no_update_options'] = 'There is no option for update.';
-
-
 $_lang['checking_if_content_exists'] = 'Проверка существования папки <span class="mono">/content</span>: ';
 $_lang['checking_if_content_writable'] = 'Проверка возможности записи в папки <span class="mono">/content</span>: ';
-
 $_lang['checking_if_temp_exists'] = 'Проверка существования папки <span class="mono">/temp</span>: ';
 $_lang['checking_if_temp_writable'] = 'Проверка возможности записи в папки  <span class="mono">/temp</span>: ';
 ?>

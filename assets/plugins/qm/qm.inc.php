@@ -34,7 +34,7 @@ class Qm {
 		extract($params);
 		
 		// Get plugin parameters
-		$this->jqpath = 'manager/media/script/jquery/jquery.min.js';
+		$this->jqpath = 'assets/js/jquery.min.js';
 		$this->loadmanagerjq = $loadmanagerjq;
 		$this->loadfrontendjq = $loadfrontendjq;
 		$this->noconflictjq = $noconflictjq;
@@ -801,7 +801,7 @@ function getCookie(cookieName)
 			
 			// Check if current document is assigned to one or more doc groups
 			$result= $this->modx->db->select('id',$table,"document='{$docID}'");
-			$rowCount= $this->modx->db->getRecordCount($result);
+			$rowCount= $this->modx->recordCount($result);
 			
 			// If document is assigned to one or more doc groups, check access
 			if ($rowCount >= 1)
@@ -814,7 +814,7 @@ function getCookie(cookieName)
 					
 					// Check if user has access to current document
 					$result= $this->modx->db->select('id',$table,"document = {$docID} AND document_group IN ({$docGroup})");
-					$rowCount = $this->modx->db->getRecordCount($result);
+					$rowCount = $this->modx->recordCount($result);
 					
 					if ($rowCount >= 1) $access = TRUE;
 				}
@@ -900,7 +900,7 @@ function getCookie(cookieName)
 		if (!$access)
 		{
 			$result = $this->modx->db->select('id',$table,"tmplvarid = {$tvId}");
-			$rowCount = $this->modx->db->getRecordCount($result);
+			$rowCount = $this->modx->recordCount($result);
 			// TV is not in any document group
 			if ($rowCount == 0) { $access = TRUE; }
 		}
@@ -908,7 +908,7 @@ function getCookie(cookieName)
 		if (!$access && $this->docGroup != '')
 		{
 			$result = $this->modx->db->select('id',$table,"tmplvarid = {$tvId} AND documentgroup IN ({$this->docGroup})");
-			$rowCount = $this->modx->db->getRecordCount($result);
+			$rowCount = $this->modx->recordCount($result);
 			if ($rowCount >= 1) { $access = TRUE; }
 		}
 		return $access;
@@ -936,12 +936,12 @@ function getCookie(cookieName)
 	//_____________________________________________________
 	function checkLocked()
 	{
-		$tbl_active_users = $this->modx->getFullTableName('active_users');
+		$activeUsersTable = $this->modx->getFullTableName('active_users');
 		$pageId = $this->modx->documentIdentifier;
 		$locked = TRUE;
 		$userId = $_SESSION['mgrInternalKey'];
 		$where = "(`action` = 27) AND `internalKey` != '{$userId}' AND `id` = '{$pageId}'";
-		$result = $this->modx->db->select('internalKey',$tbl_active_users,$where);
+		$result = $this->modx->db->select('internalKey',$activeUsersTable,$where);
 		
 		if ($this->modx->db->getRecordCount($result) === 0)
 		{
@@ -955,7 +955,7 @@ function getCookie(cookieName)
 	//_____________________________________________________
 	function setLocked($locked)
 	{
-		$tbl_active_users = $this->modx->getFullTableName('active_users');
+		$activeUsersTable = $this->modx->getFullTableName('active_users');
 		$pageId = $this->modx->documentIdentifier;
 		$userId = $_SESSION['mgrInternalKey'];
 		
@@ -972,7 +972,7 @@ function getCookie(cookieName)
 			$fields['action'] = 2;
 		}
 		$where = "internalKey = '{$userId}'";
-		$result = $this->modx->db->update($fields, $tbl_active_users, $where);
+		$result = $this->modx->db->update($fields, $activeUsersTable, $where);
 	}
 	
 	// Save TV

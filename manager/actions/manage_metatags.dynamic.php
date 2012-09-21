@@ -8,8 +8,6 @@ if(!$modx->hasPermission('manage_metatags')) {
 // initialize page view state - the $_PAGE object
 $modx->manager->initPageViewState();
 
-$tbl_site_keywords = $modx->getFullTableName('site_keywords');
-
 ?>
 <script type="text/javascript">
 
@@ -20,8 +18,9 @@ $tbl_site_keywords = $modx->getFullTableName('site_keywords');
 		var requireConfirm=false;
 		var deleteList="";
 	<?php 
+		$sql = "SELECT * FROM $dbase.`".$table_prefix."site_keywords` ORDER BY keyword ASC";
 		$rs = $modx->db->query($sql);
-		$limit = $modx->db->select('*',$tbl_site_keywords,'','keyword ASC'); 
+		$limit = mysql_num_rows($rs); 
 		for($i=0;$i<$limit;$i++) {
 		$row=$modx->db->getRow($rs);
 		?>
@@ -198,7 +197,8 @@ $tbl_site_keywords = $modx->getFullTableName('site_keywords');
 <div class="sectionHeader"><?php echo $_lang['keywords'] ;?></div><div class="sectionBody">
 <?php echo $_lang['keywords_intro'] ;?><br /><br />
 <?php
-	$ds = $modx->db->select('*',$tbl_site_keywords,'','keyword ASC');
+	$sql = "SELECT * FROM $dbase.`".$table_prefix."site_keywords` ORDER BY keyword ASC";
+	$ds = $modx->db->query($sql);
 	$grd = new DataGrid('',$ds,$number_of_results); // set page size to 0 t show all items
 	$grd->noRecordMsg = $_lang["no_keywords_found"];
 	$grd->cssClass="grid";
