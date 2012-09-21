@@ -20,8 +20,6 @@ if (!defined('MODX_SITE_URL'))     define('MODX_SITE_URL', $site_url);
 if (!defined('MODX_MANAGER_PATH')) define('MODX_MANAGER_PATH', "{$base_path}manager/");
 if (!defined('MODX_MANAGER_URL'))  define('MODX_MANAGER_URL', "{$site_url}manager/");
 
-require_once("{$base_path}manager/includes/version.inc.php");
-
 if (defined('IN_MANAGER_MODE')) init_mgr();
 
 if (version_compare(PHP_VERSION, '5.3.0') < 0) @set_magic_quotes_runtime(0);
@@ -58,7 +56,6 @@ if(!function_exists('startCMSSession'))
 	function startCMSSession()
 	{
 		global $site_sessionname;
-		$site_sessionname = base_convert(md5(__FILE__),16,36);
 		session_name($site_sessionname);
 		session_start();
 		$cookieExpiration= 0;
@@ -175,12 +172,13 @@ p{ margin:20px 0; }
 a{font-size:180%;color:#39b933;text-decoration:underline;margin-top: 30px;padding: 5px;}
 </style></head>
 <body>
+
 <div class="install">
-<p><img src="install/img/install_begin.png" /></p>
-<p>MODXがインストールされていないか設定ファイルが見つかりません。</p>
-<p>今すぐインストールしますか？</p>
-<p><a href="install/index.php?action=mode">はい</a> / <a href="http://modx.jp/">いいえ</a></p>
-</div></body></html>
+<p> <img src="install/img/install_begin.png" /> </ P>
+<p> Конфигурационный MODX файл не найден или не установлен. </ P>
+<p> Вы хотите, чтобы установить его сейчас ? </ P>
+<p> <a href="install/index.php?action=mode">Да </ a> / <a href="http://modx.jp/"> Нет  </ a> </ P>
+</ div> </ body> </ html>
 EOT;
 	exit;
 }

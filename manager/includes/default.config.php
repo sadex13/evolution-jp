@@ -19,7 +19,7 @@ $default_config['editor_css_selectors']     = '';
 $default_config['emailsubject']             = 'サイトからのお知らせ';
 $default_config['error_page']               = '1';
 $default_config['failed_login_attempts']    = '3';
-$default_config['fe_editor_lang']           = 'japanese-utf8';
+$default_config['fe_editor_lang']           = 'russian-utf8';
 $default_config['friendly_alias_urls']      = '1';
 $default_config['friendly_url_prefix']      = '';
 $default_config['friendly_url_suffix']      = '.html';
@@ -27,7 +27,7 @@ $default_config['friendly_urls']            = '0';
 $default_config['limit_by_container']       = '100';
 $default_config['mail_check_timeperiod']    = '60';
 $default_config['manager_direction']        = 'ltr';
-$default_config['manager_language']         = 'japanese-utf8';
+$default_config['manager_language']         = 'russian-utf8';
 $default_config['manager_theme']            = 'RevoStyle';
 $default_config['modx_charset']             = 'UTF-8';
 $default_config['new_file_permissions']     = '0644';
@@ -48,11 +48,11 @@ $default_config['server_offset_time']       = '0';
 $default_config['server_protocol']          = 'http';
 $default_config['session.cookie.lifetime']  = '604800';
 $default_config['show_meta']                = '0';
-$default_config['site_name']                = 'My MODX Site';
+$default_config['site_name']                = 'MODX custom sity by Dmi3yy';
 $default_config['site_slogan']              = 'ここにサイトのスローガン文を表示します。';
 $default_config['site_start']               = '1';
 $default_config['site_status']              = "1";
-$default_config['site_unavailable_message'] = 'サイトは現在メンテナンス中です。しばらくお待ちください。';
+$default_config['site_unavailable_message'] = 'Сайт временно не доступен';
 $default_config['strip_image_paths']        = '0';
 $default_config['suffix_mode']              = '1';
 $default_config['top_howmany']              = '10';
@@ -100,15 +100,15 @@ switch($settings_version)
 	case '1.0.6J':
 	case '1.0.6J-r1':
 		$tbl_site_htmlsnippets = $modx->getFullTableName('site_htmlsnippets');
-		$rs = $modx->db->select('id',$tbl_site_htmlsnippets,"name='ログイン画面'");
+		$rs = $modx->db->select('id',$tbl_site_htmlsnippets,"name='Страница входа'");
 		if(0 < $modx->db->getRecordCount($rs))
 		{
-			$modx->db->update('published=0',$tbl_site_htmlsnippets,"name='ログイン画面'");
+			$modx->db->update('published=0',$tbl_site_htmlsnippets,"name='Страница входа'");
 		}
-		$rs = $modx->db->select('id',$tbl_site_htmlsnippets,"name='ダッシュボード'");
+		$rs = $modx->db->select('id',$tbl_site_htmlsnippets,"name='Административная панель'");
 		if(0 < $modx->db->getRecordCount($rs))
 		{
-			$modx->db->update('published=0',$tbl_site_htmlsnippets,"name='ダッシュボード'");
+			$modx->db->update('published=0',$tbl_site_htmlsnippets,"name='Административная панель'");
 		}
 		break;
 }
