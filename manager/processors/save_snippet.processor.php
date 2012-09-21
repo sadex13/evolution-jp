@@ -8,13 +8,13 @@ $id = intval($_POST['id']);
 $name = $modx->db->escape(trim($_POST['name']));
 $description = $modx->db->escape($_POST['description']);
 $locked = $_POST['locked']=='on' ? 1 : 0 ;
-$snippet = trim($modx->db->escape($_POST['post']));
+$snippet = $modx->db->escape(trim($_POST['post']));
 $tbl_site_snippets = $modx->getFullTableName('site_snippets');
 
 // strip out PHP tags from snippets
-if ( strncmp($snippet, "<?", 2) == 0 ) {
+if ( strncmp($snippet, '<?', 2) == 0 ) {
     $snippet = substr($snippet, 2);
-    if ( strncmp( $snippet, "php", 3 ) == 0 ) $snippet = substr($snippet, 3);
+    if ( strncmp( $snippet, 'php', 3 ) == 0 ) $snippet = substr($snippet, 3);
     if ( substr($snippet, -2, 2) == '?>' ) $snippet = substr($snippet, 0, -2);
 }
 $properties = $modx->db->escape($_POST['properties']);
@@ -22,38 +22,48 @@ $moduleguid = $modx->db->escape($_POST['moduleguid']);
 $sysevents = $_POST['sysevents'];
 
 //Kyle Jaebker - added category support
-if (empty($_POST['newcategory']) && $_POST['categoryid'] > 0) {
+if (empty($_POST['newcategory']) && 0 < $_POST['categoryid'])
+{
     $categoryid = $modx->db->escape($_POST['categoryid']);
-} elseif (empty($_POST['newcategory']) && $_POST['categoryid'] <= 0) {
+}
+elseif(empty($_POST['newcategory']) && $_POST['categoryid'] <= 0)
+{
     $categoryid = 0;
-} else {
-    include_once "categories.inc.php";
+}
+else
+{
+    include_once($modx->config['core_path'].'categories.inc.php');
     $catCheck = checkCategory($modx->db->escape($_POST['newcategory']));
-    if ($catCheck) {
-        $categoryid = $catCheck;
-    } else {
-        $categoryid = newCategory($_POST['newcategory']);
-    }
+    
+    if ($catCheck) $categoryid = $catCheck;
+    else           $categoryid = newCategory($_POST['newcategory']);
 }
 
-if($name=="") $name = "Untitled snippet";
+if($name=='') $name = 'Untitled snippet';
 
 switch ($_POST['mode']) {
     case '23':
 
 		// invoke OnBeforeSnipFormSave event
-		$modx->invokeEvent("OnBeforeSnipFormSave",
+		$modx->invokeEvent('OnBeforeSnipFormSave',
 								array(
-									"mode"	=> "new",
-									"id"	=> $id
+									'mode'	=> 'new',
+									'id'	=> $id
 								));
 								
 		// disallow duplicate names for new snippets
-		$rs = $modx->db->select('COUNT(id)',$tbl_site_snippets,"name = '{$name}'");
+		$rs = $modx->db->select('COUNT(id)', $tbl_site_snippets, "name = '{$name}'");
 		$count = $modx->db->getValue($rs);
+<<<<<<< HEAD
 		if($count > 0) {
 			$modx->event->alert(sprintf($_lang['duplicate_name_found_general'], $_lang["snippet"], $name));
 
+=======
+		if($count > 0)
+		{
+			$modx->event->alert(sprintf($_lang['duplicate_name_found_general'], $_lang['snippet'], $name));
+			
+>>>>>>> 899a40e35baa8789327bd1ff0aa9a16c489713dd
 			// prepare a few variables prior to redisplaying form...
 			$_REQUEST['id'] = 0;
 			$_REQUEST['a'] = '23';
@@ -67,7 +77,7 @@ switch ($_POST['mode']) {
 			$content['snippet'] = preg_replace("/\?\>\s*/m", '', $content['snippet']);
 
 			include 'header.inc.php';
-			include(dirname(dirname(__FILE__)).'/actions/mutate_snippet.dynamic.php');
+			include(MODX_BASE_PATH . 'manager/actions/mutate_snippet.dynamic.php');
 			include 'footer.inc.php';
 			
 			exit;
@@ -82,6 +92,7 @@ switch ($_POST['mode']) {
 		$field['locked']      = $locked;
 		$field['properties']  = $properties;
 		$field['category']    = $categoryid;
+<<<<<<< HEAD
 		$rs = $modx->db->insert($field,$tbl_site_snippets);
 		if(!$rs){
 			echo "\$rs not set! New snippet not saved!";
@@ -110,14 +121,40 @@ switch ($_POST['mode']) {
 				$header="Location: index.php?a=76";
 			}
 			header($header);
+=======
+		$newid = $modx->db->insert($field,$tbl_site_snippets);
+		if(!$newid)
+		{
+			echo '$newid not set! New snippet not saved!';
+			exit;
+		}
+		
+		// invoke OnSnipFormSave event
+		$modx->invokeEvent('OnSnipFormSave',
+								array(
+									'mode'	=> 'new',
+									'id'	=> $newid
+								));
+		// empty cache
+		$modx->clearCache(); // first empty the cache
+		// finished emptying cache - redirect
+		if($_POST['stay']!='')
+		{
+			$a = ($_POST['stay']=='2') ? "22&id={$newid}":'23';
+			$header="Location: index.php?a={$a}&stay={$_POST['stay']}";
+		}
+		else
+		{
+			$header='Location: index.php?a=76';
+>>>>>>> 899a40e35baa8789327bd1ff0aa9a16c489713dd
 		}
         break;
     case '22':
 		// invoke OnBeforeSnipFormSave event
-		$modx->invokeEvent("OnBeforeSnipFormSave",
+		$modx->invokeEvent('OnBeforeSnipFormSave',
 								array(
-									"mode"	=> "upd",
-									"id"	=> $id
+									'mode'	=> 'upd',
+									'id'	=> $id
 								));
 								
 		//do stuff to save the edited doc
@@ -130,32 +167,46 @@ switch ($_POST['mode']) {
 		$field['properties']  = $properties;
 		$field['category']    = $categoryid;
 		$rs = $modx->db->update($field,$tbl_site_snippets,"id='{$id}'");
+<<<<<<< HEAD
 		if(!$rs){
 			echo "\$rs not set! Edited snippet not saved!";
+=======
+		if(!$rs)
+		{
+			echo '$rs not set! Edited snippet not saved!';
+>>>>>>> 899a40e35baa8789327bd1ff0aa9a16c489713dd
 			exit;
 		}
 		else {
 			// invoke OnSnipFormSave event
-			$modx->invokeEvent("OnSnipFormSave",
+			$modx->invokeEvent('OnSnipFormSave',
 									array(
-										"mode"	=> "upd",
-										"id"	=> $id
+										'mode'	=> 'upd',
+										'id'	=> $id
 									));
 			// empty cache
 			$modx->clearCache(); // first empty the cache
 			if($_POST['runsnippet']) run_snippet($snippet);
 			// finished emptying cache - redirect
+<<<<<<< HEAD
 			if($_POST['stay']!='') {
 				$a = ($_POST['stay']=='2') ? "22&id={$id}":"23";
 				$header="Location: index.php?a={$a}&stay={$_POST['stay']}";
 			} else {
 				$header="Location: index.php?a=76";
+=======
+			if($_POST['stay']!='')
+			{
+				$a = ($_POST['stay']=='2') ? "22&id={$id}":'23';
+				$header="Location: index.php?a={$a}&stay={$_POST['stay']}";
+			}
+			else
+			{
+				$header='Location: index.php?a=76';
+>>>>>>> 899a40e35baa8789327bd1ff0aa9a16c489713dd
 			}
 			header($header);
 		}
-        break;
-    default:
-	?>
-		Erm... You supposed to be here now?
-	<?php
+		break;
+	default:
 }
