@@ -15,8 +15,8 @@ mm_widget_showimagetvs(); // Image
 if($modx->config['track_visitors']==='0') mm_hideFields('log');
 
 
-mm_createTab('Для SEO', 'seo', '', '', '', '');
-mm_moveFieldsToTab('titl,keyw,desc,seoOverride,noIndex', 'seo', '', '');
+//mm_createTab('Для SEO', 'seo', '', '', '', '');
+//mm_moveFieldsToTab('titl,keyw,desc,seoOverride,noIndex', 'seo', '', '');
 mm_widget_tags('keyw',','); // Give blog tag editing capabilities to the 'documentTags (3)' TV
 
 /* ==========================================================
